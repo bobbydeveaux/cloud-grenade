@@ -1,0 +1,21 @@
+{
+	"accounts": [
+		123123123123,
+		456456456456,
+		789789789789
+	],
+	"provisioning": {
+		"123123123123": {
+			"source": "git@github.com/repo",
+			"command": "ansible | terraform | bash | make"
+		},
+		"456456456456": {
+			"source": "git@github.com/repo",
+			"command": "ansible | terraform | bash | make"
+		},
+		"789789789789": {
+			"source": "git@github.com/repo",
+			"command": "ansible | terraform | bash | make"
+		}
+	}
+}
