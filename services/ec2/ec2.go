@@ -69,13 +69,11 @@ func nukeSecurityGroups() {
 		log.Fatal(err.Error())
 	}
 
-	defaultSgroups := []*string{}
-	failedSgroups := []*string{}
+	failedSgroups := make(map[string]string)
 
 	for _, sgroup := range resp.SecurityGroups {
 		if *sgroup.GroupName == "default" {
-			//nukeSecurityGroupIngressRules(*sgroup.GroupId)
-			defaultSgroups = append(defaultSgroups, sgroup.GroupId)
+			failedSgroups[*sgroup.GroupId] = *sgroup.GroupName
 			continue
 		}
 		fmt.Println("  > Security Group Id", *sgroup.GroupName, *sgroup.GroupId)
@@ -94,7 +92,7 @@ func nukeSecurityGroups() {
 			} else {
 				fmt.Println(err.Error())
 			}
-			failedSgroups = append(failedSgroups, sgroup.GroupName)
+			failedSgroups[*sgroup.GroupId] = *sgroup.GroupName
 		}
 		fmt.Println(result)
 	}
@@ -105,11 +103,14 @@ func nukeSecurityGroups() {
 
 	fmt.Println("Due to the above failures - now iterating through to remove dependencies, and cleaning up.")
 
-	for _, dsgroup := range defaultSgroups {
-		for _, fsgroup := range failedSgroups {
-			nukeSecurityGroupIngressRules(*dsgroup, *fsgroup)
+	for groupId, _ := range failedSgroups {
+		for _, groupName := range failedSgroups {
+			nukeSecurityGroupIngressRules(groupId, groupName)
 		}
 	}
+
+	// keep calling this until failedSgroups is no longer reducing (erroring)
+	// nukeSecurityGroups()
 
 }
 
